@@ -1,9 +1,9 @@
 # Publishing @knights-eye-chess/uci-client
 
-The source manifest has `private: true` and a `0.1.0-dev.0` preview version. Repository
-visibility must be verified separately; no registry publication is claimed here.
-Choose a fresh version after
-independent source and license review; never replace an immutable candidate at
+The source manifest has `private: true`. Version `0.1.0-dev.0` records the
+extraction scaffold; `0.1.0-dev.1` is the local release candidate after source
+and security review. Repository visibility must be verified separately; no
+registry publication is claimed here. Never replace an immutable candidate at
 the same version. The package is released with the `next` dist-tag, preserving
 `latest`.
 
