@@ -22,7 +22,7 @@ export interface SearchRequest {
   limit: SearchLimit;
   multiPv?: number;
   rootMoves?: string[];
-  /** Require every named root to be scored; use for complete comparisons. */
+  /** Defaults to true for named roots. Set false for a restricted top-N search. */
   requireRootCoverage?: boolean;
   signal?: AbortSignal;
 }

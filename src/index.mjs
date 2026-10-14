@@ -15,7 +15,7 @@ export function createUciClient(acquire, { profile, timeoutMs = 65000 } = {}) {
     const kind = kinds[0];
     const count = request?.multiPv ?? 1;
     const roots = request?.rootMoves ?? [];
-    const requireRootCoverage = request?.requireRootCoverage ?? false;
+    const requireRootCoverage = request?.requireRootCoverage ?? (roots.length > 0);
     const caps = profile.capabilities;
     if (!safeText(request?.fen) || kinds.length !== 1 || !positive(limit[kind]) ||
       !caps[kind] || !positive(count) || count > 256 || (count > 1 && !caps.multiPv) ||
@@ -39,6 +39,10 @@ export function createUciClient(acquire, { profile, timeoutMs = 65000 } = {}) {
         const candidates = [...found.values()].sort((a, b) => a.multipv - b.multipv);
         const engineBuild = profile.engineBuild ?? profile.id;
         if (bestmove === '(none)' && candidates.length === 0) {
+          if (requireRootCoverage && roots.length > 0) {
+            reject(new Error('UCI engine did not complete requested score and root coverage.'));
+            return;
+          }
           // UCI reports no move, not why the board has no move. The host must
           // verify legal terminality before treating this as a chess outcome.
           resolve({ noMove: true, bestmove: null, candidates: [], engineBuild,

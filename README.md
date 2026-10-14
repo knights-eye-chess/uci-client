@@ -56,10 +56,11 @@ An explicit `bestmove (none)` with no scored roots returns `noMove: true`,
 `bestmove: null`, empty `candidates`, and top-level engine identity. This is a
 UCI no-move report, not proof of a legal terminal position; the host must check
 the board before calling it checkmate, stalemate, or draw. Scored results have
-`noMove: false` and the same top-level identity. For restricted `rootMoves`,
-`multiPv` limits the number of reported candidates and fewer lines may complete.
-Set `requireRootCoverage: true` when a comparison requires every named root;
-that request is rejected if more roots are named than `multiPv` permits.
+`noMove: false` and the same top-level identity. Named `rootMoves` require a
+scored candidate for every named root by default, so requests with more roots
+than `multiPv` are rejected. Set `requireRootCoverage: false` when the named
+roots are only a search subset for a top-N result; fewer lines may then
+complete. Unrestricted searches still treat `multiPv` as an upper bound.
 
 The root client takes an `acquire(label, onData)` callback returning
 `{ postMessage(command), terminate() }`. The transport sends `frame-ready` when

@@ -29,5 +29,5 @@
     }
   ],
   "destinationRepository": "knights-eye-chess/uci-client",
-  "status": "Extraction scaffold committed; local dev.1 candidate pending public repository and npm publication."
+  "status": "Extraction scaffold committed in the public component repository; local dev.3 candidate pending npm publication."
 }

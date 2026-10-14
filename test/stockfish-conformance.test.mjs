@@ -35,10 +35,23 @@ for (const { version, launcher } of profiles) {
       assert.deepEqual(noMove.candidates, []);
       assert.match(noMove.engineBuild, /Stockfish/i);
       const subset = await engine.search({ fen: start, limit: { depth: 3 },
-        multiPv: 1, rootMoves: ['e2e4', 'd2d4'] });
+        multiPv: 1, rootMoves: ['e2e4', 'd2d4'], requireRootCoverage: false });
       assert.equal(subset.noMove, false);
       assert.equal(subset.candidates.length, 1);
       assert(['e2e4', 'd2d4'].includes(subset.bestmove));
+    } finally { await engine.close(); }
+  });
+
+  test(`Stockfish ${version}: four named roots require coverage by default; top-three opt-out completes`, async () => {
+    const engine = createProcessEngine(options);
+    const roots = ['e2e4', 'd2d4', 'g1f3', 'c2c4'];
+    try {
+      await assert.rejects(engine.search({ fen: start, limit: { depth: 3 },
+        multiPv: 3, rootMoves: roots }), /Invalid or unsupported/);
+      const topThree = await engine.search({ fen: start, limit: { depth: 3 },
+        multiPv: 3, rootMoves: roots, requireRootCoverage: false });
+      assert.equal(topThree.candidates.length, 3);
+      assert(topThree.candidates.every(line => roots.includes(line.pv[0]) && line.depth >= 3));
     } finally { await engine.close(); }
   });
 

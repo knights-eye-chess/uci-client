@@ -13,6 +13,8 @@ on:
         type: string
 permissions:
   contents: read
+  pull-requests: read
+  issues: read
   id-token: write
 concurrency:
   group: npm-publish
@@ -34,6 +36,12 @@ jobs:
           test "$REPOSITORY_PRIVATE" = false
           node -e 'if (!/^\d+\.\d+\.\d+(?:-[\w.-]+)?$/.test(process.env.REVIEWED_VERSION) || !/^[a-f0-9]{64}$/.test(process.env.REVIEWED_SHA256)) process.exit(1)'
       - uses: actions/checkout@v4
+      - name: Require exact commit review
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REVIEWER_LOGIN: Shedal
+          REVIEW_RELEASE_BRANCH: dev
+        run: node scripts/check-review-marker.mjs
       - uses: actions/setup-node@v4
         with:
           node-version: 24.19.0
@@ -42,8 +50,15 @@ jobs:
       - run: node scripts/check-release-tooling.mjs
       - run: npm ci --ignore-scripts --registry https://registry.npmjs.org/
       - run: npm run publish:prepare
+      - name: Recheck exact commit review before publication
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REVIEWER_LOGIN: Shedal
+          REVIEW_RELEASE_BRANCH: dev
+        run: node scripts/check-review-marker.mjs
       - name: Publish only reviewed archive with provenance
         env:
+          GH_TOKEN: ${{ github.token }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           GITHUB_REPOSITORY_VISIBILITY: public
           REVIEWED_VERSION: ${{ inputs.version }}
