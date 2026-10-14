@@ -18,8 +18,8 @@ function harness(request = { fen, limit: { depth: 8 }, multiPv: 1 }, selected = 
   return { pending, receive, commands, get terminated() { return terminated; } };
 }
 
-test('complete scored roots preserve depth, score, identity and explicit coverage', async () => {
-  const h = harness({ fen, limit: { depth: 8 }, multiPv: 2, rootMoves: ['e2e4', 'd2d4'], requireRootCoverage: true });
+test('complete scored roots preserve depth, score, identity and default coverage', async () => {
+  const h = harness({ fen, limit: { depth: 8 }, multiPv: 2, rootMoves: ['e2e4', 'd2d4'] });
   h.receive('info depth 8 multipv 1 score cp 0 wdl 400 300 300 pv e2e4 e7e5');
   h.receive('info depth 9 multipv 2 score mate -3 pv d2d4 d7d5');
   h.receive('bestmove e2e4 ponder e7e5');
@@ -60,7 +60,7 @@ test('incomplete scores, PVs and explicit roots reject', async () => {
     await assert.rejects(h.pending, /did not complete/);
     assert.equal(h.terminated, 1);
   }
-  const h = harness({ fen, limit: { depth: 8 }, multiPv: 2, rootMoves: ['e2e4', 'd2d4'], requireRootCoverage: true });
+  const h = harness({ fen, limit: { depth: 8 }, multiPv: 2, rootMoves: ['e2e4', 'd2d4'] });
   h.receive('info depth 8 multipv 1 score cp 1 pv e2e4');
   h.receive('bestmove e2e4');
   await assert.rejects(h.pending, /root coverage/);
@@ -140,7 +140,7 @@ test('classifier adapter regression: invalid root counts and duplicates never ac
   const client = createUciClient(() => { acquired++; throw Error('should not acquire'); }, { profile });
   for (const request of [
     { fen, limit: { depth: 0 } }, { fen, limit: { depth: 8 }, multiPv: 0 },
-    { fen, limit: { depth: 8 }, multiPv: 2, rootMoves: ['e2e4', 'd2d4', 'g1f3'], requireRootCoverage: true },
+    { fen, limit: { depth: 8 }, multiPv: 2, rootMoves: ['e2e4', 'd2d4', 'g1f3'] },
     { fen, limit: { depth: 8 }, multiPv: 2, rootMoves: ['e2e4', 'e2e4'] },
   ]) await assert.rejects(client.search(request), /Invalid or unsupported/);
   assert.equal(acquired, 0);
@@ -178,20 +178,27 @@ test('explicit no-move has profile identity and no invented scored candidate', a
   await assert.rejects(malformed.pending, /did not complete/);
 });
 
-test('restricted roots are a search set; full coverage is opt-in', async () => {
-  const h = harness({ fen, limit: { depth: 8 }, multiPv: 1, rootMoves: ['e2e4', 'd2d4'] });
+test('restricted top-N search explicitly opts out of default full root coverage', async () => {
+  const h = harness({ fen, limit: { depth: 8 }, multiPv: 1, rootMoves: ['e2e4', 'd2d4'], requireRootCoverage: false });
   h.receive('info depth 8 multipv 1 score cp 20 pv e2e4');
   h.receive('bestmove e2e4');
   assert.deepEqual((await h.pending).candidates.map(line => line.pv[0]), ['e2e4']);
   assert(h.commands.includes('go depth 8 searchmoves e2e4 d2d4'));
-  const short = harness({ fen, limit: { depth: 8 }, multiPv: 2, rootMoves: ['e2e4', 'd2d4'] });
+  const short = harness({ fen, limit: { depth: 8 }, multiPv: 2, rootMoves: ['e2e4', 'd2d4'], requireRootCoverage: false });
   short.receive('info depth 8 multipv 1 score cp 20 pv e2e4');
   short.receive('bestmove e2e4');
   assert.equal((await short.pending).candidates.length, 1);
-  const foreign = harness({ fen, limit: { depth: 8 }, multiPv: 1, rootMoves: ['e2e4', 'd2d4'] });
+  const foreign = harness({ fen, limit: { depth: 8 }, multiPv: 1, rootMoves: ['e2e4', 'd2d4'], requireRootCoverage: false });
   foreign.receive('info depth 8 score cp 20 pv g1f3');
   foreign.receive('bestmove g1f3');
   await assert.rejects(foreign.pending, /root coverage/);
+  const missing = harness({ fen, limit: { depth: 8 }, multiPv: 2, rootMoves: ['e2e4', 'd2d4'] });
+  missing.receive('info depth 8 multipv 1 score cp 20 pv e2e4');
+  missing.receive('bestmove e2e4');
+  await assert.rejects(missing.pending, /root coverage/);
+  const noMove = harness({ fen, limit: { depth: 8 }, multiPv: 1, rootMoves: ['e2e4'] });
+  noMove.receive('bestmove (none)');
+  await assert.rejects(noMove.pending, /root coverage/);
 });
 
 test('nodes and time searches retain achieved depth zero without weakening depth limits', async () => {
