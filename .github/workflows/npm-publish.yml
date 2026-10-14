@@ -1,0 +1,51 @@
+# Generated from knightseye-net/tools/release-tooling; edit the canonical template and sync.
+name: Publish reviewed npm candidate
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Exact reviewed package version
+        required: true
+        type: string
+      archive_sha256:
+        description: SHA-256 of the reviewed staged archive
+        required: true
+        type: string
+permissions:
+  contents: read
+  id-token: write
+concurrency:
+  group: npm-publish
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require manual Dev dispatch and public repository
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          REF: ${{ github.ref }}
+          REPOSITORY_PRIVATE: ${{ github.event.repository.private }}
+          REVIEWED_VERSION: ${{ inputs.version }}
+          REVIEWED_SHA256: ${{ inputs.archive_sha256 }}
+        run: |
+          test "$EVENT_NAME" = workflow_dispatch
+          test "$REF" = refs/heads/dev
+          test "$REPOSITORY_PRIVATE" = false
+          node -e 'if (!/^\d+\.\d+\.\d+(?:-[\w.-]+)?$/.test(process.env.REVIEWED_VERSION) || !/^[a-f0-9]{64}$/.test(process.env.REVIEWED_SHA256)) process.exit(1)'
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.19.0
+          registry-url: https://registry.npmjs.org/
+      - run: npm install --global npm@11.9.0
+      - run: node scripts/check-release-tooling.mjs
+      - run: npm ci --ignore-scripts --registry https://registry.npmjs.org/
+      - run: npm run publish:prepare
+      - name: Publish only reviewed archive with provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          GITHUB_REPOSITORY_VISIBILITY: public
+          REVIEWED_VERSION: ${{ inputs.version }}
+          REVIEWED_SHA256: ${{ inputs.archive_sha256 }}
+        run: node scripts/publish-reviewed.mjs "$REVIEWED_VERSION" "$REVIEWED_SHA256"

@@ -1,0 +1,37 @@
+{
+  "name": "@knights-eye-chess/uci-client",
+  "version": "0.1.0-dev.0",
+  "private": true,
+  "type": "module",
+  "description": "UCI search client with a transport-neutral core and optional Node process host",
+  "license": "MIT",
+  "engines": { "node": ">=24.0.0" },
+  "exports": {
+    ".": { "types": "./src/index.d.mts", "import": "./src/index.mjs" },
+    "./node": { "types": "./src/node.d.mts", "import": "./src/node.mjs" }
+  },
+  "files": [
+    "src",
+    "README.md",
+    "SOURCE-ORIGIN.json",
+    "scripts",
+    "LICENSE",
+    "NOTICE",
+    "LICENSING.md",
+    "THIRD_PARTY_NOTICES.md",
+    "NPM-PUBLISHING.md",
+    "npm-release.json"
+  ],
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "check": "npm test",
+    "pack:checked": "npm run check && node scripts/pack.mjs",
+    "pack:artifact": "node scripts/pack.mjs",
+    "publish:verify": "node scripts/verify-release.mjs",
+    "publish:prepare": "npm run pack:checked && npm run publish:verify"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/knights-eye-chess/uci-client.git"
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "schema": "knights-eye-source-origin/1",
+  "package": "@knights-eye-chess/uci-client",
+  "extraction": "New transport-neutral UCI client and Node host derived from two MIT component repositories; this is not a byte-for-byte copy of either complete source module.",
+  "sources": [
+    {
+      "repository": "knights-eye-chess/move-classifier",
+      "commit": "7cde07a1aabe2e13e5c9ce66d25973a21904cf37",
+      "path": "src/chess-analysis/stockfish-adapter.ts",
+      "sha256": "0e27456972c1aeb7e19c142437d210541b79d78e5179bcbbb1274cf140748ad7",
+      "derivedTargets": ["src/index.mjs", "src/index.d.mts"],
+      "note": "Protocol/search behavior was separated from classifier policy and TypeScript adapter code."
+    },
+    {
+      "repository": "knights-eye-chess/pgn-annotator",
+      "commit": "f5479c9b3b8e551c5cbcf61aa27ac87893448903",
+      "path": "src/process-engine.mjs",
+      "sha256": "0e57abdd7cc763b5de955debd31a336370b286d9de611284510a8905a89c4e2c",
+      "derivedTargets": ["src/node.mjs", "src/node.d.mts"],
+      "note": "Node process ownership, readiness, shutdown and reuse were adapted for this package."
+    },
+    {
+      "repository": "knights-eye-chess/pgn-annotator",
+      "commit": "f5479c9b3b8e551c5cbcf61aa27ac87893448903",
+      "path": "src/cpu-diagnostics.mjs",
+      "sha256": "7c2b2a2e516b42418d2595a082a17a78f2a23c23c0c5a33388ec3d686337f504",
+      "derivedTargets": ["src/cpu-diagnostics.mjs"],
+      "note": "The extracted diagnostics file is byte-identical to this historical source."
+    }
+  ],
+  "destinationRepository": "knights-eye-chess/uci-client",
+  "status": "Extraction scaffold pending independent review and first public npm candidate; no npm publication recorded."
+}

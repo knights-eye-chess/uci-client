@@ -1,0 +1,27 @@
+name: Prepare npm artifact (no publication)
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.19.0
+          registry-url: https://registry.npmjs.org/
+      - run: npm install --global npm@11.9.0
+      - run: node scripts/check-release-tooling.mjs
+      - run: npm ci --ignore-scripts --registry https://registry.npmjs.org/
+      - run: npm run publish:prepare
+      - name: Select current candidate
+        id: package
+        run: |
+          node --input-type=module -e 'import fs from "node:fs"; const p = JSON.parse(fs.readFileSync("package.json", "utf8")); const name = p.name.replace(/^@/, "").replace("/", "-"); fs.appendFileSync(process.env.GITHUB_OUTPUT, `archive=artifacts/${name}-${p.version}.tgz\n`);'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: npm-release-candidate
+          path: ${{ steps.package.outputs.archive }}
+          retention-days: 7
