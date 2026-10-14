@@ -1,8 +1,9 @@
 // Generated from knightseye-net/tools/release-tooling; edit the canonical template and sync.
+import { requireReview } from './check-review-marker.mjs';
 import { assertReleaseTooling } from './check-release-tooling.mjs';
 import { readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
-import { spawnSync } from 'node:child_process';
+import { spawnSync, execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 
@@ -81,5 +82,8 @@ export function publishReviewed({root, version, sha256, env = process.env, run =
 }
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   assertReleaseTooling();
+  await requireReview({ repository: process.env.GITHUB_REPOSITORY, sha: process.env.GITHUB_SHA,
+    checkoutSha: execFileSync('git', ['rev-parse', 'HEAD'], { cwd: fileURLToPath(new URL('../', import.meta.url)), encoding: 'utf8' }).trim(),
+    branch: 'dev', reviewer: 'Shedal', token: process.env.GH_TOKEN });
   console.log(JSON.stringify(publishReviewed({root: fileURLToPath(new URL('../', import.meta.url)), version: process.argv[2], sha256: process.argv[3]})));
 }

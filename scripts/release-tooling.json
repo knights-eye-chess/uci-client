@@ -3,11 +3,12 @@
   "canonical": "knightseye-net/tools/release-tooling",
   "sha256": {
     "scripts/pack.mjs": "334aa4041e59b14fd2b072969f50beea64449136f7f9146d63d7277fc2e4808a",
-    "scripts/publish-reviewed.mjs": "b91c7aa578bc34c490b42006038de4ee8b9c596a592aa079bacd836d02feb647",
-    ".github/workflows/npm-publish.yml": "b25cec136db205d69a407284dae2bb66f3d56be13ed2a1367f0db167a232050d",
+    "scripts/check-review-marker.mjs": "1d06c9139a835e47f78eef1bff221d5ccdc57c10f0731796ca6f5f0e3ca49e7f",
+    "scripts/publish-reviewed.mjs": "e046dda0c47cb4f7b2d044e22d7c719d5f1fda02762bef4d013125da6258fbd3",
+    ".github/workflows/npm-publish.yml": "0bb481c699566136e271babf8bdb7860b545c0e789034c0e06f5c0556d84b250",
     "scripts/verify-release.mjs": "d0f9baead779e553385bb7c26f1238ad4e60a189a818d4db4f721a1e5f88dedc",
     "scripts/update-dependency.mjs": "9919f172be33973f124eabf56c1dc70e41e941e601783ef01aba1c47dd70db9d",
-    "scripts/check-release-tooling.mjs": "29563619bdc3e86ef10dec1e983274e36138193f04d33f2455501b59a4016e0d",
+    "scripts/check-release-tooling.mjs": "667e9c096ef28cddaefb90be92601828e7268c39f8a285f6644d3784db6f5064",
     ".github/workflows/quality.yml": "a014920a9f89dc494a020bee5f69aec779cf58825f491690f9ed1ec089ed6fa0"
   }
 }

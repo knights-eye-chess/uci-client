@@ -1,9 +1,10 @@
 # Publishing @knights-eye-chess/uci-client
 
 The source manifest has `private: true`. Version `0.1.0-dev.0` records the
-extraction scaffold; `0.1.0-dev.1` is the local release candidate after source
-and security review. Repository visibility must be verified separately; no
-registry publication is claimed here. Never replace an immutable candidate at
+extraction scaffold; `0.1.0-dev.1` is the immutable first local candidate, and
+`0.1.0-dev.2` updates its release tooling with the exact-commit review gate.
+Repository visibility must be verified separately; no registry publication is
+claimed here. Never replace an immutable candidate at
 the same version. The package is released with the `next` dist-tag, preserving
 `latest`.
 

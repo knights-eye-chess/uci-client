@@ -1,6 +1,6 @@
 {
   "name": "@knights-eye-chess/uci-client",
-  "version": "0.1.0-dev.1",
+  "version": "0.1.0-dev.2",
   "private": true,
   "type": "module",
   "description": "UCI search client with a transport-neutral core and optional Node process host",
