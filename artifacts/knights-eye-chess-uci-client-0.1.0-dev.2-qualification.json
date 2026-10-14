@@ -1,0 +1,22 @@
+{
+  "schema": "knights-eye-local-candidate/1",
+  "name": "@knights-eye-chess/uci-client",
+  "version": "0.1.0-dev.2",
+  "sourceCommitBeforeReleaseMetadata": "fe5016124bfdc26856b6e9a8338f47d77a7f3dae",
+  "canonicalReleaseToolingCommit": "knightseye-net@4e659a34db5d70d68613cdc0779c4017819f8fe3",
+  "archive": "artifacts/knights-eye-chess-uci-client-0.1.0-dev.2.tgz",
+  "bytes": 21373,
+  "sha256": "4c57718aecffa54522f62735667871e2b9dfc2fbda03e82ac4832c1e00c3af51",
+  "registryDependencies": {},
+  "checks": {
+    "npmCi": "passed with Node 24.19.0 and npm 11.9.0",
+    "sourceTests": { "passed": 22, "failed": 0, "skipped": 1 },
+    "reviewMarkerPositiveAndNegative": "passed; exact merged dev marker accepted, missing/rejected/wrong SHA denied",
+    "publisherWithoutReviewContext": "refused before archive or npm action",
+    "releaseToolingCanonicalParityAndStamp": "passed against app commit 4e659a34db5d70d68613cdc0779c4017819f8fe3",
+    "installedConsumerImportAndProcessSearch": "root and node exports and structural fixture process search passed",
+    "archiveExportsAndNpmPublishDryRun": "passed; 21 files; registry write false"
+  },
+  "publicationPerformed": false,
+  "limitations": "Real Stockfish 18/19 launcher conformance was skipped because those launchers were unavailable. No npm publication was performed. The historical dev.1 qualification and archive were left unchanged."
+}
