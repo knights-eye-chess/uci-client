@@ -1,0 +1,20 @@
+{
+  "schema": "knights-eye-local-candidate/1",
+  "name": "@knights-eye-chess/uci-client",
+  "version": "0.1.0-dev.1",
+  "sourceCommitBeforeReleaseMetadata": "ead1dc77c9da4fb6b0d50a21e8cbd36ee697db47",
+  "archive": "artifacts/knights-eye-chess-uci-client-0.1.0-dev.1.tgz",
+  "bytes": 19550,
+  "sha256": "dbb33356ae65589cc3d2c31f3017453bbad726c3b9c77943e75d425d724904d4",
+  "registryDependencies": {},
+  "checks": {
+    "npmCi": "passed with Node 24.19.0 and npm 11.9.0",
+    "sourceTests": { "passed": 19, "failed": 0, "skipped": 1 },
+    "sourceOriginHashes": "all three recorded historical source blobs matched their recorded SHA-256",
+    "releaseToolingStamp": "passed",
+    "installedConsumerImportAndProcessSearch": "root and node exports and structural fixture process search passed",
+    "archiveExportsAndNpmPublishDryRun": "passed; 20 files; registry write false"
+  },
+  "publicationPerformed": false,
+  "limitations": "Real Stockfish 18/19 launcher conformance was skipped because those launchers were unavailable. No npm publication or public repository creation was performed."
+}
