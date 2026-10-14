@@ -1,0 +1,22 @@
+{
+  "schema": "knights-eye-local-candidate/1",
+  "name": "@knights-eye-chess/uci-client",
+  "version": "0.1.0-dev.3",
+  "sourceCommitBeforeReleaseMetadata": "96ffc522a11a87fa1d8cb0ef4e1f570aef63b3a7",
+  "canonicalReleaseToolingCommit": "knightseye-net@4e659a34db5d70d68613cdc0779c4017819f8fe3",
+  "archive": "artifacts/knights-eye-chess-uci-client-0.1.0-dev.3.tgz",
+  "bytes": 21481,
+  "sha256": "d92b3582dc8a0862b404a930aab0473e4fb82d18f267915ea3096e4d7ba97105",
+  "registryDependencies": {},
+  "checks": {
+    "npmCi": "passed with Node 24.19.0 and npm 11.9.0",
+    "sourceStructuralAndReviewGateTests": { "passed": 22, "failed": 0, "skippedOptionalRealStockfishWithoutLaunchers": 1 },
+    "sourceRealStockfishConformance": { "stockfish18_0_8Passed": 5, "stockfish19_0_1Passed": 5, "failed": 0 },
+    "installedArchiveRealStockfishConformance": { "stockfish18_0_8Passed": 5, "stockfish19_0_1Passed": 5, "failed": 0 },
+    "releaseToolingCanonicalParityAndStamp": "passed against current app canonical files",
+    "installedConsumerImport": "root and node exports passed",
+    "archiveExportsAndNpmPublishDryRun": "passed; 21 files; registry write false"
+  },
+  "publicationPerformed": false,
+  "limitations": "Stockfish conformance used installed npm JS/WASM single-thread launchers in the local environment. No npm publication was performed. Historical dev.1 and dev.2 qualifications and archives were left unchanged."
+}
