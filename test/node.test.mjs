@@ -42,6 +42,8 @@ test('warm process reuses one child, records telemetry and rejects overlap', asy
     assert.equal(one.diagnostics.threads, 4);
     assert.equal(one.diagnostics.hashMb, 128);
     assert.equal(one.diagnostics.nodes, 1366);
+    assert.equal(one.diagnostics.hashfull, 237);
+    if (process.platform === 'linux') assert(one.diagnostics.processMemory.rssBytes > 0);
     assert.equal(one.candidates[0].nodes, 1366);
     assert.match(one.diagnostics.compiler, /SSE2/);
     assert.deepEqual(two.scoreProvenance.requestedLimit, { nodes: 1 });
@@ -83,4 +85,12 @@ test('generic profile validates advertised string/check options without Stockfis
   const invalid = createProcessEngine({ profile: { ...profile, setoptions: { MissingOption: 'x' } } });
   await assert.rejects(invalid.search(request), /does not advertise/);
   await invalid.close();
+});
+
+test('missing or out-of-range hashfull remains unavailable', async () => {
+  for (const mode of ['no-hashfull', 'invalid-hashfull', 'decimal-hashfull', 'suffix-hashfull', 'string-hashfull', 'mixed-string-hashfull']) {
+    const { engine } = host(mode);
+    try { assert.equal((await engine.search(request)).diagnostics.hashfull, null); }
+    finally { await engine.close(); }
+  }
 });

@@ -1,14 +1,22 @@
 {
   "name": "@knights-eye-chess/uci-client",
-  "version": "0.1.0-dev.3",
+  "version": "0.1.0-dev.5",
   "private": true,
   "type": "module",
   "description": "UCI search client with a transport-neutral core and optional Node process host",
   "license": "MIT",
-  "engines": { "node": ">=24.0.0" },
+  "engines": {
+    "node": ">=24.0.0"
+  },
   "exports": {
-    ".": { "types": "./src/index.d.mts", "import": "./src/index.mjs" },
-    "./node": { "types": "./src/node.d.mts", "import": "./src/node.mjs" }
+    ".": {
+      "types": "./src/index.d.mts",
+      "import": "./src/index.mjs"
+    },
+    "./node": {
+      "types": "./src/node.d.mts",
+      "import": "./src/node.mjs"
+    }
   },
   "files": [
     "src",
