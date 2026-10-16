@@ -8,6 +8,8 @@ export interface NativeCpuStat {
 export interface NativeSearchDiagnostics {
   schema: 'native-engine-search/1'; processReused: boolean; processInitializationMs: number;
   searchElapsedMs: number; totalElapsedMs: number; nodes: number | null; nps: number | null;
+  hashfull?: number | null;
+  processMemory?: { rssBytes: number | null; peakRssBytes: number | null };
   threads: number | null; hashMb: number | null; compiler: string | null;
   binaryVariant: 'baseline' | 'avx2' | null; cpuModel: string | null;
   loadAverageBefore: [number, number, number] | null;

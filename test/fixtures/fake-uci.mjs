@@ -24,7 +24,9 @@ input.on('line', line => {
     const depth = Number(line.split(' ')[2]);
     const roots = line.includes(' searchmoves ') ? line.split(' searchmoves ')[1].split(' ') :
       ['e2e4', 'd2d4', 'g1f3'].slice(0, count);
-    roots.forEach((root, index) => process.stdout.write(`info depth ${depth} multipv ${index + 1} score cp ${20 - index * 10} nodes ${1234 + threads + hash} nps 4567 pv ${root}\n`));
+    roots.forEach((root, index) => process.stdout.write(`info depth ${depth} multipv ${index + 1} score cp ${20 - index * 10} nodes ${1234 + threads + hash} nps 4567 ${['no-hashfull','string-hashfull','mixed-string-hashfull'].includes(mode) ? '' : mode === 'invalid-hashfull' ? 'hashfull 1001' : mode === 'decimal-hashfull' ? 'hashfull 23.4' : mode === 'suffix-hashfull' ? 'hashfull 23oops' : 'hashfull 237'} pv ${root}\n`));
+    if (mode === 'mixed-string-hashfull') process.stdout.write('info depth 4 string hashfull 237\n');
+    if (mode === 'string-hashfull') process.stdout.write('info string hashfull 237\n');
     process.stdout.write(`bestmove ${roots[0]}\n`);
   } else if (line === 'quit' && mode !== 'hang') process.exit(0);
 });

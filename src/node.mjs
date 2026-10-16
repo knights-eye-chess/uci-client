@@ -1,3 +1,4 @@
+import { readProcessMemory } from './process-memory.mjs';
 import { spawn } from 'node:child_process';
 import { createInterface } from 'node:readline';
 import { performance } from 'node:perf_hooks';
@@ -148,7 +149,7 @@ export function createProcessEngine({ profile, command, args, timeoutMs = 65000,
     }
     if (!reused) session = createSession();
     const current = session;
-    let initializationMs = 0, searchStarted, cpuBefore, nodes = null, nps = null;
+    let initializationMs = 0, searchStarted, cpuBefore, nodes = null, nps = null, hashfull = null;
     const candidateNodes = new Map();
     const abort = () => current.stop();
     signal.addEventListener('abort', abort, { once: true });
@@ -159,6 +160,9 @@ export function createProcessEngine({ profile, command, args, timeoutMs = 65000,
       const adapter = createUciClient((_label, onData) => {
         current.receiver = line => {
           if (line.startsWith('info ')) {
+            const numericInfo = line.split(/(?:^|\s)string(?:\s|$)/, 1)[0];
+            const fullness = /(?:^|\s)hashfull\s+(\d+)(?=\s|$)/.exec(numericInfo);
+            if (fullness && boundedInteger(Number(fullness[1]), 0, 1000)) hashfull = Number(fullness[1]);
             const count = /\bnodes (\d+)\b/.exec(line), rate = /\bnps (\d+)\b/.exec(line);
             if (count && Number.isSafeInteger(Number(count[1]))) nodes = Number(count[1]);
             if (rate && Number.isSafeInteger(Number(rate[1]))) nps = Number(rate[1]);
@@ -205,7 +209,7 @@ export function createProcessEngine({ profile, command, args, timeoutMs = 65000,
       result.nodes = result.candidates[0]?.nodes ?? nodes;
       result.diagnostics = { schema: 'native-engine-search/1', processReused: reused,
         processInitializationMs: initializationMs, searchElapsedMs, totalElapsedMs: elapsed(started),
-        nodes, nps, threads: selected.setoptions?.Threads ?? null,
+        nodes, nps, hashfull, processMemory: readProcessMemory(current.child.pid), threads: selected.setoptions?.Threads ?? null,
         hashMb: selected.setoptions?.Hash ?? null, compiler: current.compiler, binaryVariant: current.binaryVariant,
         cpuModel: cpuBefore?.cpuModel ?? cpuAfter.cpuModel,
         loadAverageBefore: cpuBefore?.loadAverage ?? null, loadAverageAfter: cpuAfter.loadAverage,

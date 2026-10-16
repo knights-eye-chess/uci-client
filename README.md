@@ -81,3 +81,10 @@ processes, depth/nodes/movetime, root restriction, provenance, cancellation,
 search timeout, and crash cleanup for each supplied version. Structural process
 tests also cover handshake failures and cleanup. Lc0 and Maia conformance require a
 separate profile and runtime test with the actual engine and weights.
+
+Native diagnostics include the last valid UCI `hashfull` sample (0–1000 permille,
+null when absent/invalid), plus the engine child's Linux `processMemory.rssBytes`
+and `peakRssBytes` measured after search completion. Peak RSS is the process's
+lifetime high-water mark, not a per-search allocation; warm searches inherit it.
+Unavailable process status or unsupported platforms report null, never zero.
+These observations do not change commands, depth, scores, or result admission.
