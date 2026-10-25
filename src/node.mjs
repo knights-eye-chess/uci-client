@@ -21,13 +21,13 @@ export const stockfishProfile = Object.freeze({ id: 'stockfish', command: 'stock
 
 export function createProcessEngine({ profile, command, args, timeoutMs = 65000,
   handshakeTimeoutMs = 5000, shutdownGraceMs = 250, spawnProcess = spawn, onSpawn,
-  reuseProcess = false, threads = 1, hashMb = 16, onSearchDiagnostics } = {}) {
+  reuseProcess = false, searchHistoryReset = 'none', threads = 1, hashMb = 16, onSearchDiagnostics } = {}) {
   const selected = profile ? { ...profile, command: command ?? profile.command, args: args ?? profile.args } :
     { ...stockfishProfile, command: command ?? stockfishProfile.command, args: args ?? [],
       setoptions: { Threads: threads, Hash: hashMb } };
   if (!validProfile(selected) ||
     [timeoutMs, handshakeTimeoutMs, shutdownGraceMs].some(value => !boundedInteger(value, 1, 2147483647)) ||
-    typeof reuseProcess !== 'boolean' || !boundedInteger(threads, 1, 256) || !boundedInteger(hashMb, 1, 65536) ||
+    typeof reuseProcess !== 'boolean' || !['none', 'new-game', 'clear-hash'].includes(searchHistoryReset) || !boundedInteger(threads, 1, 256) || !boundedInteger(hashMb, 1, 65536) ||
     (onSearchDiagnostics !== undefined && typeof onSearchDiagnostics !== 'function')) {
     throw new TypeError('Invalid engine process configuration.');
   }
@@ -149,13 +149,21 @@ export function createProcessEngine({ profile, command, args, timeoutMs = 65000,
     }
     if (!reused) session = createSession();
     const current = session;
-    let initializationMs = 0, searchStarted, cpuBefore, nodes = null, nps = null, hashfull = null;
+    let initializationMs = 0, historyResetMs = 0, searchStarted, cpuBefore, nodes = null, nps = null, hashfull = null;
     const candidateNodes = new Map();
     const abort = () => current.stop();
     signal.addEventListener('abort', abort, { once: true });
     try {
       if (!reused) initializationMs = await current.initialize(signal);
       if (signal.aborted) throw abortError();
+      if (searchHistoryReset !== 'none') {
+        if (searchHistoryReset === 'clear-hash' && current.options.get('Clear Hash')?.type !== 'button')
+          throw new Error('Engine does not advertise the Clear Hash button.');
+        const resetStarted = performance.now();
+        const command = searchHistoryReset === 'new-game' ? 'ucinewgame' : 'setoption name Clear Hash';
+        await current.waitFor('readyok', command + '\nisready', signal);
+        historyResetMs = elapsed(resetStarted);
+      }
       if ((request.multiPv || 1) > 1 && !current.options.has('MultiPV')) throw new Error('Engine does not advertise MultiPV.');
       const adapter = createUciClient((_label, onData) => {
         current.receiver = line => {
@@ -208,7 +216,7 @@ export function createProcessEngine({ profile, command, args, timeoutMs = 65000,
       }
       result.nodes = result.candidates[0]?.nodes ?? nodes;
       result.diagnostics = { schema: 'native-engine-search/1', processReused: reused,
-        processInitializationMs: initializationMs, searchElapsedMs, totalElapsedMs: elapsed(started),
+        processInitializationMs: initializationMs, historyResetCommand: searchHistoryReset === 'new-game' ? 'ucinewgame' : searchHistoryReset === 'clear-hash' ? 'setoption name Clear Hash' : null, historyResetMs, searchElapsedMs, totalElapsedMs: elapsed(started),
         nodes, nps, hashfull, processMemory: readProcessMemory(current.child.pid), threads: selected.setoptions?.Threads ?? null,
         hashMb: selected.setoptions?.Hash ?? null, compiler: current.compiler, binaryVariant: current.binaryVariant,
         cpuModel: cpuBefore?.cpuModel ?? cpuAfter.cpuModel,

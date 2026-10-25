@@ -13,6 +13,29 @@ const start = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 for (const { version, launcher } of profiles) {
   const options = { command: process.execPath, args: [launcher], timeoutMs: 60000,
     handshakeTimeoutMs: 20000, shutdownGraceMs: 500 };
+  test(`Stockfish ${version}: new-game warm resets match fresh evidence after unrelated searches`, async () => {
+    const warm=createProcessEngine({...options,reuseProcess:true,searchHistoryReset:'new-game'});
+    const requests=[{fen:start,limit:{depth:6},multiPv:3},
+      {fen:start,limit:{depth:6},multiPv:2,rootMoves:['e2e4','d2d4']},
+      {fen:twoReplies,limit:{depth:6},multiPv:3},
+      {fen:'7k/5Q2/6K1/8/8/8/8/8 w - - 0 1',limit:{depth:6},multiPv:3}];
+    try {
+      for(const request of requests) {
+        await warm.search({fen:start,limit:{depth:5},multiPv:1,rootMoves:['g1f3']});
+        const fresh=createProcessEngine(options);
+        let expected;try{expected=await fresh.search(request);}finally{await fresh.close();}
+        const actual=await warm.search(request);
+        assert.equal(actual.diagnostics.processReused,true);
+        assert.equal(actual.diagnostics.historyResetCommand,'ucinewgame');
+        assert.equal(actual.bestmove,expected.bestmove);
+        assert.deepEqual(actual.candidates,expected.candidates);
+      }
+    } finally {await warm.close();}
+    const clear=createProcessEngine({...options,reuseProcess:true,searchHistoryReset:'clear-hash'});
+    try {const result=await clear.search(requests[0]);assert.equal(result.diagnostics.historyResetCommand,'setoption name Clear Hash');}
+    finally{await clear.close();}
+  });
+
   test(`Stockfish ${version}: real finite MultiPV3 with only two legal replies`, async () => {
     const engine = createProcessEngine(options);
     try {
