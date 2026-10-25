@@ -8,6 +8,7 @@ export interface NativeCpuStat {
 export interface NativeSearchDiagnostics {
   schema: 'native-engine-search/1'; processReused: boolean; processInitializationMs: number;
   searchElapsedMs: number; totalElapsedMs: number; nodes: number | null; nps: number | null;
+  historyResetCommand?: 'ucinewgame' | 'setoption name Clear Hash' | null; historyResetMs?: number;
   hashfull?: number | null;
   processMemory?: { rssBytes: number | null; peakRssBytes: number | null };
   threads: number | null; hashMb: number | null; compiler: string | null;
@@ -24,6 +25,8 @@ export interface ProcessEngineOptions {
   command?: string; args?: string[]; threads?: number; hashMb?: number;
   timeoutMs?: number; handshakeTimeoutMs?: number; shutdownGraceMs?: number;
   spawnProcess?: typeof spawn; onSpawn?: (child: ChildProcessWithoutNullStreams) => void;
+  /** Optional engine history reset plus readiness fence before every search. */
+  searchHistoryReset?: 'none' | 'new-game' | 'clear-hash';
   reuseProcess?: boolean;
   onSearchDiagnostics?: (diagnostics: NativeSearchDiagnostics) => void;
 }

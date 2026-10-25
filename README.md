@@ -88,3 +88,15 @@ and `peakRssBytes` measured after search completion. Peak RSS is the process's
 lifetime high-water mark, not a per-search allocation; warm searches inherit it.
 Unavailable process status or unsupported platforms report null, never zero.
 These observations do not change commands, depth, scores, or result admission.
+
+For controlled history-independent experiments, the Node host accepts
+`searchHistoryReset: 'new-game'`. It sends `ucinewgame` followed by `isready` and waits
+for `readyok` before every search, including the first. The process can still be
+reused. The default is `'none'`, preserving existing search history. A separate
+`'clear-hash'` control sends `setoption name Clear Hash` instead and requires the
+engine to advertise that button; it uses the same readiness fence. This requests
+the engine's new-game reset; reproducibility remains engine-specific and must be
+measured. Reset failure or cancellation drains the process before returning.
+Diagnostics include `historyResetCommand` and `historyResetMs`, separately from
+process initialization and search time. Resetting can change scores and move
+classifications downstream; it is not a transparent performance setting.
